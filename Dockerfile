@@ -35,6 +35,9 @@ RUN curl -L https://github.com/pterodactyl/panel/releases/latest/download/panel.
 # Copy the .env.example to .env
 COPY .env.example .env
 
+# Install Composer dependencies
+RUN composer install --no-dev --optimize-autoloader
+
 # Generate the application encryption key
 RUN php artisan key:generate --force
 
@@ -47,8 +50,7 @@ RUN sed -i "s|DB_CONNECTION=.*|DB_CONNECTION=mysql|" .env && \
     sed -i "s|DB_PASSWORD=.*|DB_PASSWORD=EdFepEFOowrxYUCsjoeMaQjjaejwGgWH|" .env
 
 # Install Pterodactyl dependencies and set up the panel
-RUN composer install --no-dev --optimize-autoloader \
-    && php artisan p:environment:setup --email=${USER_EMAIL} --username=${USER_NAME} --password=${USER_PASSWORD} --force \
+RUN php artisan p:environment:setup --email=${USER_EMAIL} --username=${USER_NAME} --password=${USER_PASSWORD} --force \
     && php artisan migrate --force
 
 # Set Permissions for Apache
