@@ -7,22 +7,22 @@ ENV USER_EMAIL=akuntesimage@gmail.com
 ENV USER_NAME=akuntesimage
 ENV USER_PASSWORD=666
 
-# Database Connection Strings
-ENV MYSQL_URL=mysql://root:EdFepEFOowrxYUCsjoeMaQjjaejwGgWH@junction.proxy.rlwy.net:52860/railway
-ENV POSTGRESQL_URL=postgresql://postgres:lxavbaOIDxAAcAxucXiHmzxwXEhlKGoN@autorack.proxy.rlwy.net:11912/railway
-
 # Install dependencies
 RUN apt-get update && apt-get install -y \
+    software-properties-common \
     apache2 \
-    php php-cli php-mbstring php-bcmath php-curl php-zip php-xml php-tokenizer php-mysql php-gd php-imagick php-opcache php-pgsql \
-    mariadb-client \
     curl git unzip zip \
-    docker.io \
+    && add-apt-repository ppa:ondrej/php \
+    && apt-get update && apt-get install -y \
+    php8.2 php8.2-cli php8.2-mbstring php8.2-bcmath php8.2-curl php8.2-zip php8.2-xml php8.2-tokenizer php8.2-mysql php8.2-gd php8.2-imagick php8.2-opcache php8.2-pgsql \
+    mariadb-client \
     nodejs npm \
     && apt-get clean
 
-# Enable Apache mod_rewrite
-RUN a2enmod rewrite && service apache2 restart
+# Set PHP 8.2 as the default version
+RUN update-alternatives --set php /usr/bin/php8.2 && \
+    update-alternatives --set phpize /usr/bin/phpize8.2 && \
+    update-alternatives --set php-config /usr/bin/php-config8.2
 
 # Install Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
