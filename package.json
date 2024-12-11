@@ -13,7 +13,7 @@
   "author": "Pterodactyl",
   "license": "MIT",
   "dependencies": {
-    "@pterodactyl/panel": "^1.0.0",
+    "@pterodactyl/panel": "git+https://github.com/pterodactyl/panel.git",
     "express": "^4.17.1",
     "mysql2": "^2.3.3",
     "sequelize": "^6.12.0"
