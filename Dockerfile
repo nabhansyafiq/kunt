@@ -11,15 +11,24 @@ ENV USER_PASSWORD=666
 ENV MYSQL_URL=mysql://root:EdFepEFOowrxYUCsjoeMaQjjaejwGgWH@junction.proxy.rlwy.net:52860/railway
 ENV POSTGRESQL_URL=postgresql://postgres:lxavbaOIDxAAcAxucXiHmzxwXEhlKGoN@autorack.proxy.rlwy.net:11912/railway
 
-# Install dependencies
-RUN apt-get update && apt-get install -y \
+# Install PHP 8.2 and other dependencies
+RUN apt-get update -y && \
+    apt-get install -y software-properties-common && \
+    add-apt-repository ppa:ondrej/php && \
+    apt-get update -y && \
+    apt-get install -y \
     apache2 \
-    php php-cli php-mbstring php-bcmath php-curl php-zip php-xml php-tokenizer php-mysql php-gd php-imagick php-opcache php-pgsql \
+    php8.2 php8.2-cli php8.2-fpm php8.2-mbstring php8.2-bcmath php8.2-curl php8.2-zip php8.2-xml php8.2-tokenizer php8.2-mysql php8.2-gd php8.2-imagick php8.2-opcache php8.2-pgsql \
     mariadb-client \
     curl git unzip zip \
     docker.io \
     nodejs npm \
     && apt-get clean
+
+# Set PHP 8.2 as default
+RUN update-alternatives --set php /usr/bin/php8.2
+RUN update-alternatives --set phpize /usr/bin/phpize8.2
+RUN update-alternatives --set php-config /usr/bin/php-config8.2
 
 # Enable Apache mod_rewrite
 RUN a2enmod rewrite && service apache2 restart
