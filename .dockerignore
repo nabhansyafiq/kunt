@@ -1,9 +1,7 @@
 # Ignore node_modules (can be reinstalled in the image)
 node_modules/
 
-# Ignore environment files
-.env
-.env.example
+
 
 # Ignore logs, temporary files, and cache
 *.log
