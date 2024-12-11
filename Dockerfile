@@ -7,18 +7,17 @@ RUN groupadd -r pterodactyl && useradd -r -g pterodactyl -G sudo -m -d /home/pte
 # Menyalin file package.json ke direktori kerja
 COPY package.json /home/pterodactyl/package.json
 
-# Menyalin file .env ke direktori kerja
-COPY .env /home/pterodactyl/.env
-
 # Menyetel direktori kerja
 WORKDIR /home/pterodactyl
 
 # Mengatur hak akses untuk direktori kerja
 RUN chown -R pterodactyl:pterodactyl /home/pterodactyl
 
+# Menginstal paket @pterodactyl/panel dari GitHub
+RUN npm install https://github.com/pterodactyl/panel.git
+
 # Menjalankan perintah instalasi
 RUN npm install
-RUN npm install -g wings
 
 # Menjalankan perintah untuk memulai aplikasi
 RUN npm run key:generate
