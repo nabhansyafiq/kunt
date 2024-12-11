@@ -1,4 +1,4 @@
-# Base Image
+# Use Ubuntu 20.04 as the base image
 FROM ubuntu:20.04
 
 # Set environment variables
@@ -13,27 +13,13 @@ ENV POSTGRESQL_URL=postgresql://postgres:lxavbaOIDxAAcAxucXiHmzxwXEhlKGoN@autora
 
 # Install dependencies
 RUN apt-get update && apt-get install -y \
-    software-properties-common \
     apache2 \
+    php php-cli php-mbstring php-bcmath php-curl php-zip php-xml php-tokenizer php-mysql php-gd php-imagick php-opcache php-pgsql \
     mariadb-client \
     curl git unzip zip \
     docker.io \
     nodejs npm \
     && apt-get clean
-
-# Add the Ondrej PHP repository to install PHP 8.2
-RUN add-apt-repository ppa:ondrej/php -y && apt-get update
-
-# Install PHP 8.2 and related extensions
-RUN apt-get install -y \
-    php8.2 php8.2-cli php8.2-fpm php8.2-mbstring php8.2-bcmath php8.2-curl php8.2-zip php8.2-xml php8.2-tokenizer php8.2-mysql php8.2-gd php8.2-imagick php8.2-opcache php8.2-pgsql \
-    php8.2-dev \
-    && apt-get clean
-
-# Set PHP 8.2 as default
-RUN update-alternatives --set php /usr/bin/php8.2
-RUN update-alternatives --set phpize /usr/bin/phpize8.2
-RUN update-alternatives --set php-config /usr/bin/php-config8.2
 
 # Enable Apache mod_rewrite
 RUN a2enmod rewrite && service apache2 restart
@@ -46,8 +32,13 @@ WORKDIR /var/www/html
 RUN curl -L https://github.com/pterodactyl/panel/releases/latest/download/panel.tar.gz -o panel.tar.gz \
     && tar -xzvf panel.tar.gz && rm panel.tar.gz
 
-# Set up the environment for MySQL (default database)
+# Copy the .env.example to .env
 COPY .env.example .env
+
+# Generate the application encryption key
+RUN php artisan key:generate --force
+
+# Set up the environment for MySQL (default database)
 RUN sed -i "s|DB_CONNECTION=.*|DB_CONNECTION=mysql|" .env && \
     sed -i "s|DB_HOST=.*|DB_HOST=junction.proxy.rlwy.net|" .env && \
     sed -i "s|DB_PORT=.*|DB_PORT=52860|" .env && \
@@ -57,18 +48,8 @@ RUN sed -i "s|DB_CONNECTION=.*|DB_CONNECTION=mysql|" .env && \
 
 # Install Pterodactyl dependencies and set up the panel
 RUN composer install --no-dev --optimize-autoloader \
-    && php artisan key:generate \
     && php artisan p:environment:setup --email=${USER_EMAIL} --username=${USER_NAME} --password=${USER_PASSWORD} --force \
     && php artisan migrate --force
-
-# Optionally Set Up PostgreSQL (uncomment if needed)
-# RUN sed -i "s|DB_CONNECTION=.*|DB_CONNECTION=pgsql|" .env && \
-#     sed -i "s|DB_HOST=.*|DB_HOST=autorack.proxy.rlwy.net|" .env && \
-#     sed -i "s|DB_PORT=.*|DB_PORT=11912|" .env && \
-#     sed -i "s|DB_DATABASE=.*|DB_DATABASE=railway|" .env && \
-#     sed -i "s|DB_USERNAME=.*|DB_USERNAME=postgres|" .env && \
-#     sed -i "s|DB_PASSWORD=.*|DB_PASSWORD=lxavbaOIDxAAcAxucXiHmzxwXEhlKGoN|" .env && \
-#     php artisan migrate --force
 
 # Set Permissions for Apache
 RUN chown -R www-data:www-data /var/www/html && chmod -R 755 /var/www/html
