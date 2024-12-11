@@ -1,0 +1,24 @@
+{
+  "name": "pterodactyl",
+  "version": "1.0.0",
+  "description": "Pterodactyl Panel",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "key:generate": "node key:generate",
+    "migrate": "node migrate",
+    "db:seed": "node db:seed"
+  },
+  "keywords": [],
+  "author": "Pterodactyl",
+  "license": "MIT",
+  "dependencies": {
+    "@pterodactyl/panel": "^1.0.0",
+    "express": "^4.17.1",
+    "mysql2": "^2.3.3",
+    "sequelize": "^6.12.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.15"
+  }
+}
